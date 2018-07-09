@@ -1,0 +1,8 @@
+# K8s pod subnet
+POD_SUBNET_CIDR: 192.168.x.x/xx
+
+# K8s service subnet
+SERVICE_SUBNET_CIDR: 192.168.x.x/xx
+
+# K8s API Server advertise address
+APISERVER_ADVERTISE_ADDRESS: 0.0.0.0

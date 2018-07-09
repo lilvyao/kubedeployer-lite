@@ -1,0 +1,12 @@
+---
+# This Playbook would deploy a "single-node" Kubernetes cluster
+
+- hosts: node
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - { role: prep-work }
+    - { role: install-required-components}
+    - { role: deploy-k8s}
+    - { role: post-work}

@@ -1,0 +1,33 @@
+---
+#This role help master node gets ready to accept requests
+
+- name: post-work | Enable kubectl | Create $HOME/.kube
+  file:
+    path: "$HOME/.kube"
+    owner: root
+    group: root
+    state: directory
+    mode: 0755
+
+- name: post-work | Enable kubectl | Move admin.conf to $HOME/.kube
+  shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+- name: post-work | Enable kubectl | Change admin.conf file permission to 600
+  shell: chown $(id -u):$(id -g) $HOME/.kube/config
+
+- name: post-work | Enable kubectl | Enable kubectl autocomplete
+  shell: echo "source <(kubectl completion bash)" >> ~/.bashrc
+
+- name: post-work | Setup flannel network | Template flanneld deployment file
+  template:
+    src: "kube-flannel.yml.j2"
+    dest: "$HOME/kube-flannel.yml"
+    mode: 644
+    owner: "root"
+    group: "root"
+
+- name: post-work | Setup flannel network | Deploy flanneld pod using kubernetes
+  shell: kubectl apply -f $HOME/kube-flannel.yml
+
+- name: post-work | Remove master isolation #so that pods can be deployed on master node
+  shell: kubectl taint nodes --all node-role.kubernetes.io/master-

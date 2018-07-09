@@ -1,0 +1,21 @@
+---
+#This role deploys k8s cluster to a single node
+
+- name: deploy-k8s | Reload daemon
+  systemd: daemon_reload=yes
+
+- name: deploy-k8s | Restart docker
+  service:
+    name: docker
+    state: restarted
+
+- name: deploy-k8s | Restart kubelet
+  service:
+    name: kubelet
+    state: restarted
+
+- name: deploy-k8s | Reset kubeadm
+  shell: kubeadm reset -f
+
+- name: deploy-k8s | Deploy k8s through kubeadm
+  shell: kubeadm init --pod-network-cidr={{ POD_SUBNET_CIDR }} --service-cidr={{ SERVICE_SUBNET_CIDR }} --apiserver-advertise-address={{ APISERVER_ADVERTISE_ADDRESS }}

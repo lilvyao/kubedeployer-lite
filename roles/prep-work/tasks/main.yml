@@ -1,0 +1,35 @@
+---
+#This role gets the environment ready for k8s deployment
+
+- name: prep-work | Disable selinux
+  shell: setenforce 0
+  ignore_errors: yes
+
+- name: prep-work | Stop and disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: prep-work | Disable swap
+  shell: swapoff -a
+  ignore_errors: yes
+
+- name: prep-work | Comment out swap in fstab
+  replace: 
+    dest: /etc/fstab
+    regexp: '/dev/mapper/VolGroup-swap'
+    replace: '#/dev/mapper/VolGroup-swap'
+
+- name: prep-work | Enable IP forwarding | Update sysctl
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: "{{ item }}"
+  with_items:
+    - "net.ipv4.ip_forward = 1"
+    - "net.ipv6.conf.all.forwarding = 1"
+  ignore_errors: yes
+
+- name: prep-work | Enable IP forwarding | Force sysctl policy
+  shell: sysctl -p
+  ignore_errors: yes

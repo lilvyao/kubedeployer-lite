@@ -1,0 +1,25 @@
+---
+- name: install-required-components | Add Kubernetes repository
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    enabled: yes
+    gpgcheck: no
+    repo_gpgcheck: no
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+- name: install-required-components | Yum install kubelet, kubeadm, kubectl, and docker
+  become: true
+  yum: pkg={{ item }} state=present
+  with_items:
+    - kubeadm
+    - kubelet
+    - kubectl
+    - docker
+
+- name: install-required-components | Start and enable docker service
+  shell: systemctl enable docker && systemctl restart docker
+
+- name: install-required-components | Start and enable kubelet service
+  shell: systemctl enable kubelet && systemctl restart kubelet
